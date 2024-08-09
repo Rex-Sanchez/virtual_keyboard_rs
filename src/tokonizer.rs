@@ -3,6 +3,7 @@ use crate::tokens::Token;
 
 
 pub(crate) type TokensGroups = Vec<Vec<Token>>;
+#[derive(Debug)]
 pub(crate) struct Tokonizer(TokensGroups);
 
 impl Tokonizer {

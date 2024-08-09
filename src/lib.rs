@@ -1,10 +1,7 @@
-
-use std::{
-    thread::sleep,
-    time::Duration,
-};
+use std::{thread::sleep, time::Duration};
 
 use event_type::EventType;
+use tokens::Token;
 use tokonizer::Tokonizer;
 use uinput::Device;
 
@@ -15,7 +12,6 @@ mod tokens;
 mod tokonizer;
 
 use error::Result;
-
 
 /// Virtual keyboard struct;
 pub struct VirtKeyboard {
@@ -45,11 +41,22 @@ impl VirtKeyboard {
 }
 
 #[test]
-fn convert_from_file() {
+fn send_keystrokes() {
     let mut kb = VirtKeyboard::new("yeh").unwrap();
 
-    let s = "<Shift>+12 <Space> <Shift>+i <Space>n2";
-    kb.send_keystrokes(s);
+    let a = vec![
+        vec![Token::Shift, Token::Plus, Token::_9],
+        vec![Token::Shift, Token::Plus, Token::H],
+        vec![Token::E, Token::L, Token::L, Token::O],
+        vec![Token::Space],
+        vec![Token::W, Token::O, Token::R, Token::L, Token::D],
+        vec![Token::Shift, Token::Plus, Token::_1],
+        vec![Token::Shift, Token::Plus, Token::_0],
+    ];
+
+    let map = "<Shift>+9 <Shift>+h ello <Space> world <Shift>+1 <Shift>+0";
+
+    kb.send_keystrokes(map);
+
+    assert_eq!(a, Tokonizer::new(map).get());
 }
-
-
