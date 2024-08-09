@@ -1,17 +1,21 @@
 
-use std::{thread::sleep, time::Duration};
+use std::{
+    thread::sleep,
+    time::Duration,
+};
 
 use event_type::EventType;
+use tokonizer::Tokonizer;
 use uinput::Device;
 
 pub mod error;
 mod event_type;
 mod keycodes;
-mod token;
+mod tokens;
+mod tokonizer;
 
 use error::Result;
 
-pub type KeyCodes = Vec<[u8; 8]>;
 
 /// Virtual keyboard struct;
 pub struct VirtKeyboard {
@@ -32,15 +36,20 @@ impl VirtKeyboard {
 
     /// Send keystrokes to the virtual keyboard;
     pub fn send_keystrokes(&mut self, map: &str) {
-        map.split(" ").for_each(|f| {
-            EventType::new(f).run(&mut self.device).ok();
+        let tokens = Tokonizer::new(map);
+        let events = EventType::from_tokens(tokens);
+        events.into_iter().for_each(|event| {
+            event.run(&mut self.device).ok();
         });
     }
-
-    /// Translate virtual keypresses to keyboard bytes;
-    pub fn to_keycodes(&mut self, map: &str) -> KeyCodes {
-        map.split(" ")
-            .map(|x| EventType::new(x).as_keycodes())
-            .collect::<KeyCodes>()
-    }
 }
+
+#[test]
+fn convert_from_file() {
+    let mut kb = VirtKeyboard::new("yeh").unwrap();
+
+    let s = "<Shift>+12 <Space> <Shift>+i <Space>n2";
+    kb.send_keystrokes(s);
+}
+
+

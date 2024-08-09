@@ -1,47 +1,62 @@
-use uinput::event::keyboard::Key;
 use uinput::Device;
 
 use crate::error::Result;
-use crate::keycodes::KeyCode;
-use crate::token::Token;
+use crate::tokens::{KeyCodeGroup, Token};
+use crate::Tokonizer;
 
 #[derive(Debug)]
 pub(crate) enum EventType {
-    Hold { token: Vec<Token> },
-    Click { token: Vec<Token> },
+    Hold { token: Vec<KeyCodeGroup> },
+    Click { token: Vec<KeyCodeGroup> },
 }
 
 impl EventType {
-    pub(crate) fn new(map: &str) -> Self {
-        if map.contains("+") {
-            return EventType::Hold {
-                token: map
-                    .split("+")
-                    .map(|s| Token::new(s))
-                    .collect::<Vec<Token>>(),
-            };
-        } else {
-            return EventType::Click {
-                token: map.chars().map(|s| Token::new(&s.to_string())).collect(),
-            };
-        }
+    pub(crate) fn from_tokens(tokens: Tokonizer) -> Vec<EventType> {
+        tokens
+            .get()
+            .into_iter()
+            .map(|token_group| {
+                if token_group.contains(&Token::Plus) {
+                    let tokens = token_group
+                        .into_iter()
+                        .map(|token| {
+                            if token != Token::Plus {
+                                return Some(token.to_keycode());
+                            } else {
+                                return None;
+                            }
+                        })
+                        .flatten()
+                        .collect::<Vec<KeyCodeGroup>>();
+
+                    return EventType::Hold { token: tokens };
+                } else {
+                    return EventType::Click {
+                        token: token_group
+                            .iter()
+                            .map(|f| f.to_keycode())
+                            .collect::<Vec<KeyCodeGroup>>(),
+                    };
+                }
+            })
+            .collect::<Vec<EventType>>()
     }
     pub(crate) fn run(&self, dev: &mut Device) -> Result<()> {
         match self {
             EventType::Hold { token } => {
                 token.iter().for_each(|t| match t {
-                    Token::Kp(val) => {
+                    KeyCodeGroup::Kp(val) => {
                         dev.press(val).ok();
                     }
-                    Token::Key(val) => {
+                    KeyCodeGroup::Key(val) => {
                         dev.press(val).ok();
                     }
                 });
                 token.iter().for_each(|t| match t {
-                    Token::Kp(val) => {
+                    KeyCodeGroup::Kp(val) => {
                         dev.release(val).ok();
                     }
-                    Token::Key(val) => {
+                    KeyCodeGroup::Key(val) => {
                         dev.release(val).ok();
                     }
                 });
@@ -49,10 +64,10 @@ impl EventType {
             }
             EventType::Click { token } => {
                 token.iter().for_each(|k| match k {
-                    Token::Kp(val) => {
+                    KeyCodeGroup::Kp(val) => {
                         dev.click(val).ok();
                     }
-                    Token::Key(val) => {
+                    KeyCodeGroup::Key(val) => {
                         dev.click(val).ok();
                     }
                 });
@@ -60,44 +75,5 @@ impl EventType {
             }
         }
         Ok(())
-    }
-    pub(crate) fn as_keycodes(&self) -> [u8; 8] {
-        let mut codes: [u8; 8] = [0; 8];
-
-        let get_codes = |codes: &mut [u8; 8], token: &Vec<Token>| {
-            for t in token {
-                match t {
-                    Token::Kp(k) => match k {
-                        _ => {
-                            *KeyCode::from_keypad(*k);
-                        }
-                    },
-                    Token::Key(k) => {
-                        match k {
-                            Key::LeftAlt
-                            | Key::LeftShift
-                            | Key::LeftControl
-                            | Key::LeftMeta
-                            | Key::RightMeta
-                            | Key::RightControl
-                            | Key::RightShift
-                            | Key::RightAlt => codes[0] |= *KeyCode::from_key(*k),
-                            _ => codes[2] = *KeyCode::from_key(*k),
-                        };
-                    }
-                }
-            }
-        };
-
-        match self {
-            EventType::Hold { token } => {
-                get_codes(&mut codes, token);
-            }
-            EventType::Click { token } => {
-                get_codes(&mut codes, token);
-            }
-        }
-
-        codes
     }
 }
