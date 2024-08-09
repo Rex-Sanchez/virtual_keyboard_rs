@@ -1,7 +1,6 @@
 use std::{thread::sleep, time::Duration};
 
 use event_type::EventType;
-use tokens::Token;
 use tokonizer::Tokonizer;
 use uinput::Device;
 
@@ -40,6 +39,12 @@ impl VirtKeyboard {
     }
 }
 
+#[cfg(test)]
+mod test{
+
+use crate::tokens::Token;
+use crate::{tokonizer::Tokonizer, VirtKeyboard};
+
 #[test]
 fn send_keystrokes() {
     let mut kb = VirtKeyboard::new("yeh").unwrap();
@@ -59,4 +64,5 @@ fn send_keystrokes() {
     kb.send_keystrokes(map);
 
     assert_eq!(a, Tokonizer::new(map).get());
+}
 }
