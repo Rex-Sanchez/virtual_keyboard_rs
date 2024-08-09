@@ -157,7 +157,7 @@ impl Token {
 
             "Shift" => Self::Shift,
             "LShift" => Self::LShift,
-            "TShift" => Self::RShift,
+            "RShift" => Self::RShift,
 
             "+" => Self::Plus,
             "-" => Self::Minus,
