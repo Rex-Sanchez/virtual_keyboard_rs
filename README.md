@@ -3,12 +3,12 @@
 
 
 Easy to use virtual keyboard for rust.
+At this time this only works on linux.
 
 
 
 ```rust
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    
     let mut vk = VirtKeyboard::new("keyboard_name")?;
     vk.send_keystrokes("<Shift>+h ello <Space> world <Shift>+1")
     Ok(())
