@@ -40,29 +40,29 @@ impl VirtKeyboard {
 }
 
 #[cfg(test)]
-mod test{
+mod test {
 
-use crate::tokens::Token;
-use crate::{tokonizer::Tokonizer, VirtKeyboard};
+    use crate::tokens::Token;
+    use crate::{tokonizer::Tokonizer, VirtKeyboard};
 
-#[test]
-fn send_keystrokes() {
-    let mut kb = VirtKeyboard::new("yeh").unwrap();
+    #[test]
+    fn send_keystrokes() {
+        let mut kb = VirtKeyboard::new("yeh").unwrap();
 
-    let a = vec![
-        vec![Token::Shift, Token::Plus, Token::_9],
-        vec![Token::Shift, Token::Plus, Token::H],
-        vec![Token::E, Token::L, Token::L, Token::O],
-        vec![Token::Space],
-        vec![Token::W, Token::O, Token::R, Token::L, Token::D],
-        vec![Token::Shift, Token::Plus, Token::_1],
-        vec![Token::Shift, Token::Plus, Token::_0],
-    ];
+        let a = vec![
+            vec![Token::Shift, Token::Plus, Token::_9],
+            vec![Token::Shift, Token::Plus, Token::H],
+            vec![Token::E, Token::L, Token::L, Token::O],
+            vec![Token::Space],
+            vec![Token::W, Token::O, Token::R, Token::L, Token::D],
+            vec![Token::Shift, Token::Plus, Token::_1],
+            vec![Token::Shift, Token::Plus, Token::_0],
+        ];
 
-    let map = "<Shift>+9 <Shift>+h ello <Space> world <Shift>+1 <Shift>+0";
+        let map = "<Shift>+9 <Shift>+h ello <Space> world <Shift>+1 <Shift>+0";
 
-    kb.send_keystrokes(map);
+        kb.send_keystrokes(map);
 
-    assert_eq!(a, Tokonizer::new(map).get());
-}
+        assert_eq!(a, Tokonizer::new(map).get());
+    }
 }

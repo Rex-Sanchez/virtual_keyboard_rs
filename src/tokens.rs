@@ -218,7 +218,7 @@ impl Token {
             Token::Shift => KeyCodeGroup::Key(Key::LeftShift),
             Token::LShift => KeyCodeGroup::Key(Key::LeftShift),
             Token::RShift => KeyCodeGroup::Key(Key::RightShift),
-            Token::Super => KeyCodeGroup::Key(Key::LeftShift),
+            Token::Super => KeyCodeGroup::Key(Key::LeftMeta),
             Token::RSuper => KeyCodeGroup::Key(Key::RightMeta),
             Token::LSuper => KeyCodeGroup::Key(Key::LeftMeta),
             Token::Alt => KeyCodeGroup::Key(Key::LeftAlt),
